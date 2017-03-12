@@ -37,8 +37,8 @@ bg: {
  
 };
 
-// MAIN
 
+// Main function
 function main(){
 
     getFreeRam(function(freeRam){
@@ -58,8 +58,8 @@ function main(){
     })  
 }
 main();
-// FUNCTIONS
 
+// Formats either to GB or MB
 function memoryFormatter(memory, gb){
     if(gb){
         return Math.round(memory/1024/1024/1024);
@@ -68,6 +68,7 @@ function memoryFormatter(memory, gb){
     }
 }
 
+// os.freemem didnt provide all available memory so had to use bash 
 function getFreeRam(callBack){
     var command = "awk '/Mem:/ {print $7}' <(free -b)";
 
@@ -82,9 +83,13 @@ function getFreeRam(callBack){
         return null;
     });
 }
+
+// calculates percentage
 function percents(x, y){
     return Math.round((y-x)/y*100);
 }
+
+// draws a horizontal bar with given percentage
 function percentageMeter(percents){
     const max = 10;
     const value = Math.round(percents/max);
@@ -110,6 +115,7 @@ function percentageMeter(percents){
     return color + meterFill + colors.fg.White + meterEmpty + colors.Reset;
 }
 
+// formats the uptime to neater form
 function upTimeFormatter(uptime){
     var formatted = "";
     var seconds,hours, days;
@@ -132,6 +138,7 @@ function upTimeFormatter(uptime){
     return formatted;
 }
 
+// colors the percentage according to its value
 function logPercentage(percentage){
     if(percentage > 50 && percentage < 80){
         return colors.fg.Yellow + percentage + "%"+ colors.Reset;
