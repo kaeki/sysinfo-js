@@ -1,4 +1,4 @@
-const os =  require('os');
+const os = require('os');
 const spawnSync = require('child_process').spawnSync;
 
 // Color codes for logging
@@ -19,7 +19,7 @@ const colors = {
         Magenta: '\x1b[35m',
         Cyan: '\x1b[36m',
         White: '\x1b[37m',
-        Crimson: '\x1b[38m'
+        Crimson: '\x1b[38m',
     },
     bg: {
         Black: '\x1b[40m',
@@ -30,90 +30,87 @@ const colors = {
         Magenta: '\x1b[45m',
         Cyan: '\x1b[46m',
         White: '\x1b[47m',
-        Crimson: '\x1b[48m'
-    }
+        Crimson: '\x1b[48m',
+    },
 };
 
 const memory = {
-    format: function(memory, GB){
-        if(GB){
+    format: function(memory, GB) {
+        if(GB) {
             return Math.round(memory/1024/1024/1024);
-        }else{
+        } else {
             return Math.round(memory/1024/1024);
         }
     },
-    getFreeRam: function(){
+    getFreeRam: function() {
         const command = "awk '/Mem:/ {print $7}' <(free -b)";
         const bash = spawnSync('bash', ['-c', command]);
-        return Number(bash.stdout.toString())
+        return Number(bash.stdout.toString());
     },
-    getRamString: function(totalMemory){
+    getRamString: function(totalMemory) {
         const freeRam = this.getFreeRam();
         const usedMB = this.format((totalMemory - freeRam), false);
         const totalMB = this.format(totalMemory, false);
         const percentageWithMeter = percents.getString(usedMB, totalMB, true);
 
         return usedMB + 'MB / ' + totalMB + 'MB '+percentageWithMeter;
-    }
+    },
 };
 
 const percents = {
-    calculatePercents: function(x, y){
+    calculatePercents: function(x, y) {
         return Math.round(x/y*100);
     },
-    getColor: function(percentage){
+    getColor: function(percentage) {
         let color = colors.fg.Green;
-        if(percentage > 50 && percentage < 80){
+        if(percentage > 50 && percentage < 80) {
             color = colors.fg.Yellow;
-        }
-        else if(percentage > 80){
+        } else if(percentage > 80) {
             color = color.fg.Red;
         }
         return color;
     },
-    getMeter: function(percentage, color){
+    getMeter: function(percentage, color) {
         const value = Math.round(percentage/10);
         const utfBoxChar = String.fromCharCode(9638);
-        let meter = { fill: '', empty: '' };
+        let m = {fill: '', empty: ''};
         let i = 0;
-        while(i <= 10){
-            if(i <= value){
-                meter.fill += utfBoxChar;
-            }else{
-                meter.empty += utfBoxChar;
+        while(i <= 10) {
+            if(i <= value) {
+                m.fill += utfBoxChar;
+            } else {
+                m.empty += utfBoxChar;
             }
             i++;
         }
-        return color + meter.fill + colors.fg.White + meter.empty + colors.Reset;
+        return color + m.fill + colors.fg.White + m.empty + colors.Reset;
     },
-    getString: function(free, total, withMeter){
+    getString: function(free, total, withMeter) {
         const percentage = this.calculatePercents(free, total);
         const color = this.getColor(percentage);
         const value = '(' + color + percentage + colors.Reset + ')';
         const meter = this.getMeter(percentage, color);
-        if(withMeter){
+        if(withMeter) {
             return value+' '+meter;
-        }
-        else{
+        } else {
             return value;
         }
-    }
+    },
 };
 
-const uptimeFormatter = function(uptime){
+const uptimeFormatter = function(uptime) {
     let formatted = '';
-    let seconds, hours, days;
     formatted = uptime+'sec';
-    if(uptime > 60){
-        minutes = Math.floor(uptime/60);
-        seconds = uptime - (minutes*60);
+    if(uptime > 60) {
+        let minutes = Math.floor(uptime/60);
+        let seconds = uptime - (minutes*60);
         formatted = minutes+'min '+seconds+'sec';
-        if(minutes > 60){
-            hours = Math.floor(minutes/60);
+        if(minutes > 60) {
+            let hours = Math.floor(minutes/60);
             minutes = minutes-(hours*60);
             formatted = hours+'h '+minutes+'min '+seconds+'sec';
-            if(hours > 24){
-                days = Math.floor(hours/24);
+            if(hours > 24) {
+                let days = Math.floor(hours/24);
                 hours = hours-(days*24);
                 formatted = days+'d '+hours+'h '+minutes+'min '+seconds+'sec';
             }
@@ -123,12 +120,12 @@ const uptimeFormatter = function(uptime){
 };
 
 const sysInfo = {
-    init: function(){
+    init: function() {
         this.header = colors.fg.Cyan +
-            '###################~~SYSTEM INFO~~##################' + 
+            '###################~~SYSTEM INFO~~##################' +
             colors.Reset;
         this.footer = colors.fg.Cyan +
-            '####################################################' + 
+            '####################################################' +
             colors.Reset;
         this.device = colors.fg.Magenta+os.hostname()+colors.Reset;
         this.platform = os.platform()+' '+os.release();
@@ -136,14 +133,14 @@ const sysInfo = {
         this.memory = memory.getRamString(os.totalmem());
         this.print();
     },
-    print: function(){
+    print: function() {
         console.log(this.header);
         console.log('Device: \t'+this.device);
         console.log('Platform: \t'+this.platform);
         console.log('Uptime: \t'+this.uptime);
         console.log('Memory: \t'+this.memory);
         console.log(this.footer);
-    }
-}
+    },
+};
 
 sysInfo.init();
