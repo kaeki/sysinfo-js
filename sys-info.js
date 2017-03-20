@@ -88,7 +88,7 @@ const percents = {
     getString: function(free, total, withMeter) {
         const percentage = this.calculatePercents(free, total);
         const color = this.getColor(percentage);
-        const value = '(' + color + percentage + colors.Reset + ')';
+        const value = '(' + color + percentage + '%' + colors.Reset + ')';
         const meter = this.getMeter(percentage, color);
         if(withMeter) {
             return value+' '+meter;
